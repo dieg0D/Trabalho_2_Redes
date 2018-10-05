@@ -1,7 +1,9 @@
 require 'socket'                 
 
 server = TCPServer.open(2000)
+server.listen(5)
 clientes = []
+
 message = ""
 class Client
     
@@ -14,20 +16,18 @@ class Client
 end
 
 
-loop {                           
-    message = server.accept.gets
-    cl = Client.new(server.accept)
+loop {
+    begin
+        client = server.accept_nonblock
+        clientes << client
+    rescue IO::WaitReadable, Errno::EINTR
+    end 
     
-    unless clientes.include?(cl)
-        clientes << cl
-        cl.client.puts "Bem vindo ao chat meu parça"
-    else
-        puts message
-        clientes.each do |cls|
-            if cls.client != cl.client 
-                cls.client.puts(Time.now.ctime)   
-                cls.client.puts message
-            end    
-        end   
+    clientes.each do |cls|
+        cls.puts(Time.now.ctime)  
+        cls.puts("Closing the connection. Bye!")
+        puts "teste do diego" 
     end
-}
+ 
+ }
+ 
