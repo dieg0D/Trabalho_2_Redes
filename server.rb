@@ -1,33 +1,34 @@
 require 'socket'                 
 
-server = TCPServer.open(2000)
+conClient = TCPServer.open(2000)
 clientes = []
 message = ""
-class Client
+#class Client
     
-    attr_reader :client
+ #   attr_reader :client
 
-    def initialize(acc)
-        @client = acc
-    end
+#    def initialize(acc)
+#        @client = acc
+#    end
 
-end
+#end
 
-
-loop {                           
-    message = server.accept.gets
-    cl = Client.new(server.accept)
-    
+puts "Servidor inicializado...."
+quit = " "
+while true                            
+    cl = conClient.accept
     unless clientes.include?(cl)
         clientes << cl
-        cl.client.puts "Bem vindo ao chat meu parça"
+        cl.puts "Bem vindo ao chat meu parça"
     else
+        puts "Entrei no ELSE"
+        message = cl.recvfrom(10000)
         puts message
         clientes.each do |cls|
-            if cls.client != cl.client 
-                cls.client.puts(Time.now.ctime)   
-                cls.client.puts message
+            if cls != cl 
+                cls.puts(Time.now.ctime)   
+                cls.puts message
             end    
         end   
     end
-}
+end
