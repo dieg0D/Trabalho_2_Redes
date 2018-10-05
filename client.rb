@@ -1,17 +1,15 @@
-require 'socket'      
+require 'socket'
+include Socket::Constants
 
-hostname = 'localhost'
-port = 2000
+server = Socket.new(AF_INET, SOCK_STREAM, 0)
+sockaddr = Socket.sockaddr_in(2000, 'localhost')
+server.connect(sockaddr)
 
-server = TCPSocket.open(hostname, port)
-
-server.puts("auishfuiashfuifsa")
 
 loop{
     puts "saiu"
     loop do
-        line = server.gets
-        puts line
+        puts server.readline.chomp
         system("stty raw -echo")
         char = STDIN.read_nonblock(1) rescue nil
         system("stty -raw echo")
