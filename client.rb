@@ -13,7 +13,8 @@ while msg != '\x18'
         puts line.chomp
     end    
      puts "digite sua msg: "
-     server.puts "ksfldjsaklfs"
+     msg = gets
+     server.puts msg
 end
     
 
