@@ -22,7 +22,8 @@ loop {
         clientes << client
     rescue IO::WaitReadable, Errno::EINTR
     end 
-    
+    puts clientes.length
+    sleep(1)
     clientes.each do |cls|
         cls.puts(Time.now.ctime)  
         cls.puts("Closing the connection. Bye!")
