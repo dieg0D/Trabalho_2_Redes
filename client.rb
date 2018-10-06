@@ -2,21 +2,23 @@ require 'socket'
 
 hostname = 'localhost'
 port = 2000
-
-server = TCPSocket.open(hostname, port)
-msg = " "
-while msg != '\x18'
-    line = " "
-    line = server.gets
-    t = Time.now
-    if line != " "
-        puts line.chomp
+str = ""
+socket = TCPSocket.open(hostname, port)
+loop{
+  loop do
+        system("stty echo")
+        mensagem = socket.read_nonblock(10000) rescue nil
+        system("stty echo")
+        if mensagem.to_s.tr("\n","") != ""
+            puts mensagem.to_s.tr("\n","")
+        end    
+        system("stty echo")
+        str = STDIN.read_nonblock(10000) rescue nil
+        system("stty echo")
+        break if str.to_s.include? "\n"
+    end
+    if str != nil
+        socket.puts(str)
     end    
-     puts "digite sua msg: "
-     msg = gets
-     server.puts msg
-end
-    
-
-
+}
          
