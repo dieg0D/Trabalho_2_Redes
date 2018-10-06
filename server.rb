@@ -1,6 +1,6 @@
 require 'socket'                 
 
-server = TCPServer.open(2000)
+conClient = TCPServer.open(2000)
 clientes = []
 cl_ms = {}
 client = ""
@@ -9,8 +9,8 @@ mensagem = ""
 
 class Client
     
-    attr_reader :client
-
+   attr_reader :client
+  
     def initialize(client)
         @client = client
         @nick = "usr#{clientes.length}"
@@ -49,5 +49,4 @@ loop {
     end  
 
     sleep(1)
- }
- 
+  }

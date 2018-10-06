@@ -4,7 +4,6 @@ hostname = 'localhost'
 port = 2000
 str = ""
 socket = TCPSocket.open(hostname, port)
-
 loop{
   loop do
         system("stty echo")
