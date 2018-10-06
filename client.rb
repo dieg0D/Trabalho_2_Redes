@@ -7,14 +7,19 @@ socket = TCPSocket.open(hostname, port)
 
 loop{
   loop do
-        line = socket.gets
-        puts line
-        system("stty raw -echo")
+        system("stty echo")
+        mensagem = socket.read_nonblock(10000) rescue nil
+        system("stty echo")
+        if mensagem.to_s.tr("\n","") != ""
+            puts mensagem.to_s.tr("\n","")
+        end    
+        system("stty echo")
         str = STDIN.read_nonblock(10000) rescue nil
-        system("stty -raw echo")
+        system("stty echo")
         break if str.to_s.include? "\n"
-        sleep(5) 
     end
-    socket.puts(str)
+    if str != nil
+        socket.puts(str)
+    end    
 }
          

@@ -2,8 +2,9 @@ require 'socket'
 
 server = TCPServer.open(2000)
 clientes = []
+cl_ms = {}
 client = ""
-message = ""
+mensagem = ""
 
 
 class Client
@@ -18,24 +19,33 @@ end
 
 puts "Server iniciado!"
 loop {
-    if clientes != []
-        system("stty raw -echo")
-        message = clientes[0].read_nonblock(10000) rescue nil
-        system("stty -raw echo")
-    end    
     begin
         client = server.accept_nonblock
         unless clientes.include?(client)
             clientes << client
             client.puts "Bem vindo ao chat meu parça"
-            puts "#{client} as #{Time.now.strftime("%H:%M")} : Entrou no canal "
-        end
+            puts "#{Time.now.strftime("%H:%M")} #{client} Entrou no canal! "
+        end 
     rescue IO::WaitReadable, Errno::EINTR
     end
-    puts "#{Time.now.strftime("%H:%M")} #{client} disse: #{message}"
-    clientes.each do |cls|
-        cls.puts message
-    end
-    sleep(2)
+
+    if clientes != []
+        clientes.each do |cls|
+            system("stty echo")
+            mensagem = cls.read_nonblock(10000) rescue nil
+            system("stty echo")
+            cl_ms[cls] = mensagem
+            if mensagem.to_s.tr("\n","") != ""
+                puts "#{Time.now.strftime("%H:%M")} #{cls} disse: #{mensagem}"
+                clientes.each do |aux|
+                    if aux != cls
+                        aux.puts "#{cls} disse :  #{cl_ms[cls].to_s.tr("\n","")}"
+                    end
+                end
+            end   
+        end   
+    end  
+
+    sleep(1)
  }
  
