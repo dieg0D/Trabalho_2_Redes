@@ -9,12 +9,13 @@ mensagem = ""
 
 class Client
     
-    attr_reader :client
+    attr_accessor :client, :nick, :canal, :usuario 
 
     def initialize(client)
         @client = client
-        @nick = "usr#{clientes.length}"
+        @nick = "USR"
         @canal = 0
+        @usuario = ""
     end
 
 end
@@ -25,8 +26,8 @@ loop {
         client = Client.new(server.accept_nonblock)
         unless clientes.include?(client)
             clientes << client
-            client.puts "Bem vindo ao chat meu parça"
-            puts "#{Time.now.strftime("%H:%M")} #{client} Entrou no canal! "
+            client.client.puts "Bem vindo ao chat meu parça"
+            puts "#{Time.now.strftime("%H:%M")} #{client.client} Entrou no canal! "
         end 
     rescue IO::WaitReadable, Errno::EINTR
     end
@@ -34,14 +35,14 @@ loop {
     if clientes != []
         clientes.each do |cls|
             system("stty echo")
-            mensagem = cls.read_nonblock(10000) rescue nil
+            mensagem = cls.client.read_nonblock(10000) rescue nil
             system("stty echo")
-            cl_ms[cls] = mensagem
+            cl_ms[cls.client] = mensagem
             if mensagem.to_s.tr("\n","") != ""
-                puts "#{Time.now.strftime("%H:%M")} #{cls} disse: #{mensagem}"
+                puts "#{Time.now.strftime("%H:%M")} #{cls.client} disse: #{mensagem}"
                 clientes.each do |aux|
                     if aux != cls
-                        aux.puts "#{cls} disse :  #{cl_ms[cls].to_s.tr("\n","")}"
+                        aux.client.puts "#{cls.client} disse :  #{cl_ms[cls.client].to_s.tr("\n","")}"
                     end
                 end
             end   
