@@ -2,21 +2,19 @@ require 'socket'
 
 hostname = 'localhost'
 port = 2000
-
-server = TCPSocket.open(hostname, port)
-
-server.puts("auishfuiashfuifsa")
+str = ""
+socket = TCPSocket.open(hostname, port)
 
 loop{
-    puts "saiu"
-    loop do
-        line = server.gets
+  loop do
+        line = socket.gets
         puts line
         system("stty raw -echo")
-        char = STDIN.read_nonblock(1) rescue nil
+        str = STDIN.read_nonblock(10000) rescue nil
         system("stty -raw echo")
-        break if /q/i =~ char
-        sleep(1)
+        break if str.to_s.include? "\n"
+        sleep(5) 
     end
+    socket.puts(str)
 }
          

@@ -1,10 +1,11 @@
 require 'socket'                 
 
 server = TCPServer.open(2000)
-server.listen(5)
 clientes = []
-
+client = ""
 message = ""
+
+
 class Client
     
     attr_reader :client
@@ -15,20 +16,26 @@ class Client
 
 end
 
-
+puts "Server iniciado!"
 loop {
+    if clientes != []
+        system("stty raw -echo")
+        message = clientes[0].read_nonblock(10000) rescue nil
+        system("stty -raw echo")
+    end    
     begin
         client = server.accept_nonblock
-        clientes << client
+        unless clientes.include?(client)
+            clientes << client
+            client.puts "Bem vindo ao chat meu parça"
+            puts "#{client} as #{Time.now.strftime("%H:%M")} : Entrou no canal "
+        end
     rescue IO::WaitReadable, Errno::EINTR
-    end 
-    puts clientes.length
-    sleep(1)
-    clientes.each do |cls|
-        cls.puts(Time.now.ctime)  
-        cls.puts("Closing the connection. Bye!")
-        puts "teste do diego" 
     end
- 
+    puts "#{Time.now.strftime("%H:%M")} #{client} disse: #{message}"
+    clientes.each do |cls|
+        cls.puts message
+    end
+    sleep(2)
  }
  
