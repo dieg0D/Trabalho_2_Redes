@@ -11,8 +11,10 @@ class Client
     
     attr_reader :client
 
-    def initialize(acc)
-        @client = acc
+    def initialize(client)
+        @client = client
+        @nick = "usr#{clientes.length}"
+        @canal = 0
     end
 
 end
@@ -20,7 +22,7 @@ end
 puts "Server iniciado!"
 loop {
     begin
-        client = server.accept_nonblock
+        client = Client.new(server.accept_nonblock)
         unless clientes.include?(client)
             clientes << client
             client.puts "Bem vindo ao chat meu parça"
