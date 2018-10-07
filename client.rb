@@ -1,4 +1,4 @@
-require 'socket'      
+require 'socket'    
 
 hostname = 'localhost'
 port = 2000
@@ -11,15 +11,18 @@ loop{
         mensagem = socket.read_nonblock(10000) rescue nil
         system("stty echo")
         if mensagem.to_s.tr("\n","") != ""
-            puts mensagem.to_s.tr("\n","")
+            puts mensagem
         end    
         system("stty echo")
         str = STDIN.read_nonblock(10000) rescue nil
         system("stty echo")
         break if str.to_s.include? "\n"
     end
-    if str != nil
-        socket.puts(str)
-    end    
+    begin
+        socket.puts(str)  
+    rescue => Errno::EPIPE
+        socket.close
+        exit!
+    end 
 }
          
