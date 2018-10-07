@@ -1,4 +1,4 @@
-require 'socket'      
+require 'socket'    
 
 hostname = 'localhost'
 port = 2000

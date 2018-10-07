@@ -7,15 +7,14 @@ client = ""
 mensagem = ""
 canais = ["General", "Séries", "Músicas", "Jogos", "Filmes"]
 
-
 class Client
     
     attr_accessor :client, :nick, :canal, :usuario 
     @@count_users = 0
     def initialize(client)
         @client = client
-        @nick = "USR#{@@count_users}"
-        @canal = 1
+        @nick = "User#{@@count_users}"
+        @canal = 0
         @usuario = ""
         @@count_users = @@count_users+1
     end
@@ -23,7 +22,7 @@ class Client
     def listar(clientes, canais)
         
         @client.puts 
-        @canais.each_with_index do |cn, index|
+        canais.each_with_index do |cn, index|
             @client.puts "Canal {#{index+1}} - #{cn} #{contar(clientes, index+1)} pessoas conectadas "
         end
         @client.puts 
@@ -48,65 +47,127 @@ def parser(msg,client,clientes,canais)
     aux = ivet[1]
     flag =false
 
+    if client.usuario == "" && comando != "USUARIO" && comando != "SAIR"
+        comando = "ERROR"
+    end    
+
+    if client.usuario != "" && client.canal == 0 && comando != "SAIR" && comando != "LISTAR" && 
+                                                    comando != "ENTRAR" && comando != "NICK" && 
+                                                    comando != "USUARIO" && comando != "COMANDOS"  
+        
+        comando = "ERROR2"
+    end    
+
     case comando
     when "NICK"
-        client.nick= aux.tr("\n","")
+        igual = false
+        clientes.each do |cls|
+            if aux.tr("\n","") == cls.nick && cls != client
+                igual = true
+            end
+        end
+
+        if igual == true
+            client.client.puts "Esse nick já está em uso por favor selecione outro!!!"
+        else
+            clientes.each do |cls|
+                if cls.canal == client.canal
+                    if cls != client
+                        cls.client.puts "#{Time.now.strftime("%H:%M")} #{client.nick} teve seu nick alterado para #{aux.tr("\n","")}"
+                    else
+                        client.client.puts "#{Time.now.strftime("%H:%M")} Seu nick foi alterado de #{client.nick} para #{aux.tr("\n","")}"
+                    end
+                end
+            end
+             client.nick= aux.tr("\n","")
+
+        end
         flag= true
     when "USUARIO"
         client.usuario = aux.tr("\n","")
+        client.client.puts "Muito bem vc se cadastrou!"
+        client.client.puts "utilize o comando LISTAR para ver os canais disponiveis"
+        client.client.puts "E utilize o comando ENTRAR para entrar no canal desejado"
         flag=true
     when "LISTAR"
-
         client.listar(clientes,canais)
 
+        client.client.puts 
+        client.client.puts "Utilize o comando ENTRAR com o numero do canal para poder ir para ele"
+        client.client.puts 
         flag=true 
     when "SAIR"
         clientes.each do |cls|
-            if cls.canal == client.canal
-                cls.client.puts "#{client.nick} saiu do canal"
+            if cls.canal == client.canal && client.canal != 0 
+                if cls != client
+                    cls.client.puts "#{Time.now.strftime("%H:%M")} #{client.nick} saiu do canal"
+                else
+                    client.client.puts "#{Time.now.strftime("%H:%M")} Você saiu do canal"
+                end
             end
         end
-        client.client.puts "Você foi desconectado aperte ENTER para sair!!!!"
+        client.client.puts "#{Time.now.strftime("%H:%M")} Você foi desconectado aperte ENTER duas vezes para sair!!!!"
         client.client.close
         clientes.delete(client)
         flag=true
     when "SAIRC"
         clientes.each do |cls|
             if cls.canal == client.canal
-                cls.client.puts "#{client.nick} saiu do canal"
-            end
-        end
-        client.client.canal=1
-        flag=true
-    when "ENTRAR"
-        client.canal=aux.to_i
-        clientes.each do |cls|
-            if cls.canal == client.canal
-                if cls.client == client.client
-                    cls.client.puts "Você entrou no canal #{canais[aux.to_i-1]}"
+                if cls != client
+                    cls.client.puts "#{Time.now.strftime("%H:%M")} #{client.nick} saiu do canal"
                 else
-                    cls.client.puts "#{client.nick} entrou no canal"
+                    client.client.puts "#{Time.now.strftime("%H:%M")} Você saiu do canal"
                 end
-
             end
         end
+        client.canal = 0
+        flag=false
+    when "ENTRAR"
+        if aux.to_i > 0 && aux.to_i <= 5 
+            if aux.to_i == client.canal
+                client.client.puts "Você já está no canal selecionado"
+            else
+                client.canal=aux.to_i
+                clientes.each do |cls|
+                    if cls.canal == client.canal
+                        if cls != client
+                            cls.client.puts "#{Time.now.strftime("%H:%M")} #{client.nick} entrou no canal"
+                        else
+                            client.client.puts "#{Time.now.strftime("%H:%M")} Você entrou no canal de #{canais[aux.to_i-1]}"
+                        end
+                    end
+                end 
+            end
+        else
+            client.client.puts "O canal que foi digitado não existe"
+        end
         flag=true
-    when"COMANDOS"
+    when "COMANDOS"
+        client.client.puts "Comandos aceitos pelo chat: NICK, USUARIO, LISTAR, SAIR, SAIRC, ENTRAR, COMANDOS"
         client.client.puts
-        client.client.puts "Comandos aceitos pelo chat: NICK, USUARIO, LISTAR, SAIR, SAIRC, ENTRAR"
         client.client.puts "NICK altere seu apelido" 
         client.client.puts "USUARIO altere seu nome"
-        client.client.puts "LISTAR lista dos canais disponiveis"
-        client.client.puts "SAIR finalizar a sessao do cliente"
+        client.client.puts "LISTAR lista os canais disponiveis"
+        client.client.puts "SAIR finaliza a sessão "
         client.client.puts "SAIRC sair do canal atual"
         client.client.puts "ENTRAR entrar em um canal"
-        client.client.puts "COMANDOS entrar em um canal"
+        client.client.puts "COMANDOS mostra os comandos "
+        client.client.puts
         client.client.puts "PS: lembre-se, comandos em maiusculo rsrsrs"
+        client.client.puts "PS1: Os comandos precisam estar separados por um espaço do seu argumento"
         client.client.puts
         flag=true
+    when "ERROR"
+        client.client.puts "Para vc começar a conversar com outras pessoas utilize o comando USUARIO"
+        flag=true
+    when "ERROR2"
+        client.client.puts "Você não está conectado"
+        client.client.puts "utilize o comando LISTAR para ver os canais disponiveis"
+        client.client.puts "E utilize o comando ENTRAR para entrar no canal desejado"
+        flag=true 
     else
+             
     end
-
     flag
 end    
 
@@ -116,27 +177,29 @@ loop {
         client = Client.new(server.accept_nonblock)
         unless clientes.include?(client)
             clientes << client
-            client.client.puts "##################################"
-            client.client.puts "#  Bem vindo ao chat meu parça   #"
-            client.client.puts "#  Segue abaixo as instruções    #"
-            client.client.puts "##################################"
+            client.client.puts "####################################"
+            client.client.puts "#        Bem vindo ao chat         #"
+            client.client.puts "#    Segue abaixo as instruções    #"
+            client.client.puts "####################################"
             client.client.puts
-            client.client.puts "Comandos aceitos pelo chat: NICK, USUARIO, LISTAR, SAIR, SAIRC, ENTRAR"
+            client.client.puts "Comandos aceitos pelo chat: NICK, USUARIO, LISTAR, SAIR, SAIRC, ENTRAR, COMANDOS"
+            client.client.puts
             client.client.puts "NICK altere seu apelido" 
             client.client.puts "USUARIO altere seu nome"
-            client.client.puts "LISTAR lista dos canais disponiveis"
-            client.client.puts "SAIR finalizar a sessao do cliente"
+            client.client.puts "LISTAR lista os canais disponiveis"
+            client.client.puts "SAIR finaliza a sessão "
             client.client.puts "SAIRC sair do canal atual"
             client.client.puts "ENTRAR entrar em um canal"
-            client.client.puts "COMANDOS entrar em um canal"
+            client.client.puts "COMANDOS mostra os comandos"
             client.client.puts "PS: lembre-se, comandos em maiusculo rsrsrs"
+            client.client.puts "PS1: Os comandos precisam estar separados por um espaço do seu argumento"
             client.client.puts
             client.client.puts "OOHHHH notamos que vc chegou agora!!!!!"
             client.client.puts "Para vc começar a conversar com outras pessoas utilize o comando USUARIO"
             client.client.puts 
             puts "#{Time.now.strftime("%H:%M")} #{client.nick} Entrou no canal! "
         end 
-    rescue IO::WaitReadable, Errno::EINTR
+    rescue IO::WaitReadable, Errno::EINTR, Errno::EPIPE
     end
 
     if clientes != []
@@ -148,9 +211,10 @@ loop {
             cl_ms[cls.client] = mensagem
             if mensagem.to_s.tr("\n","") != ""
                 puts "#{Time.now.strftime("%H:%M")} #{cls.nick} disse: #{mensagem}"
+                flagComando = parser(mensagem,cls,clientes,canais)
                 clientes.each do |aux|
-                    if aux != cls && !parser(mensagem,cls,clientes,canais) && aux.canal == cls.canal
-                        aux.client.puts "#{Time.now.strftime("%H:%M")} #{cls.nick} disse :  #{cl_ms[cls.client].to_s.tr("\n","")}"
+                    if !flagComando && aux.canal == cls.canal && aux != cls 
+                        aux.client.puts "#{Time.now.strftime("%H:%M")} #{cls.nick}:  #{cl_ms[cls.client].to_s.tr("\n","")}"
                     end
                 end
             end   
