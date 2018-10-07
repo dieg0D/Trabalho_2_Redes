@@ -148,6 +148,18 @@ def parser(msg,client,clientes,canais)
                 client.client.puts "Você já está no canal selecionado"
                 client.client.puts 
             else
+                canalAnt = client.canal
+                if canalAnt != 0
+                    clientes.each do |cls|
+                        if cls.canal == client.canal
+                            if cls != client
+                                cls.client.puts "#{Time.now.strftime("%H:%M")} #{client.nick} saiu do canal"
+                            else
+                                client.client.puts "#{Time.now.strftime("%H:%M")} Você trocou do canal #{canais[canalAnt-1]} para o canal #{canais[aux.to_i-1]}"    
+                            end    
+                        end
+                    end        
+                end    
                 client.canal=aux.to_i
                 clientes.each do |cls|
                     if cls.canal == client.canal
