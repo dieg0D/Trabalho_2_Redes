@@ -5,6 +5,7 @@ clientes = []
 cl_ms = {}
 client = ""
 mensagem = ""
+canais = ["General", "Séries", "Músicas", "Jogos", "Filmes"]
 
 
 class Client
@@ -19,12 +20,12 @@ class Client
         @@count_users = @@count_users+1
     end
 
-    def listar(clientes)
-        @client.puts "Canal 1 - General #{contar(clientes, 1)} pessoas conectadas "
-        @client.puts "Canal 2 - Séries  #{contar(clientes, 2)} pessoas conectadas "
-        @client.puts "Canal 3 - Músicas #{contar(clientes, 3)} pessoas conectadas "
-        @client.puts "Canal 4 - Jogos   #{contar(clientes, 4)} pessoas conectadas "
-        @client.puts "Canal 5 - Filmes  #{contar(clientes, 5)} pessoas conectadas "
+    def listar(clientes, canais)
+        @client.puts 
+        @canais.each_with_index do |cn, index|
+            @client.puts "Canal {#{index+1}} - #{cn} #{contar(clientes, index+1)} pessoas conectadas "
+        end
+        @client.puts 
     end
     
     private
@@ -40,7 +41,7 @@ class Client
         end
 end
 
-def parser(msg,client,clientes)
+def parser(msg,client,clientes,canais)
     ivet = msg.to_s.split(' ',2)
     comando = ivet[0]
     aux = ivet[1]
@@ -54,7 +55,7 @@ def parser(msg,client,clientes)
         client.usuario = aux.tr("\n","")
         flag=true
     when "LISTAR"
-        client.listar(clientes)
+        client.listar(clientes,canais)
         flag=true 
     when "SAIR"
         clientes.each do |cls|
@@ -78,7 +79,12 @@ def parser(msg,client,clientes)
         client.canal=aux.to_i
         clientes.each do |cls|
             if cls.canal == client.canal
-                cls.client.puts "#{client.nick} entrou no canal"
+                if cls.client == client.client
+                    cls.client.puts "Você entrou no canal #{canais[aux.to_i-1]}"
+                else
+                    cls.client.puts "#{client.nick} entrou no canal"
+                end
+
             end
         end
         flag=true
@@ -139,7 +145,7 @@ loop {
             if mensagem.to_s.tr("\n","") != ""
                 puts "#{Time.now.strftime("%H:%M")} #{cls.nick} disse: #{mensagem}"
                 clientes.each do |aux|
-                    if aux != cls && !parser(mensagem,cls,clientes) && aux.canal == cls.canal
+                    if aux != cls && !parser(mensagem,cls,clientes,canais) && aux.canal == cls.canal
                         aux.client.puts "#{Time.now.strftime("%H:%M")} #{cls.nick} disse :  #{cl_ms[cls.client].to_s.tr("\n","")}"
                     end
                 end
