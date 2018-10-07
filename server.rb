@@ -62,7 +62,10 @@ def parser(msg,client,clientes,canais)
     when "NICK"
         igual = false
         if aux.tr("\n", "") == ""
+
+                client.client.puts             
                 client.client.puts "É preciso passar um parametro para NICK. Exemplo: NICK diego"            
+                client.client.puts             
         else
             clientes.each do |cls|
                 if aux.tr("\n","") == cls.nick && cls != client       
@@ -71,7 +74,10 @@ def parser(msg,client,clientes,canais)
             end
 
             if igual == true
+
+                client.client.puts 
                 client.client.puts "Esse nick já está em uso por favor selecione outro!!!"
+                client.client.puts 
             else
                 clientes.each do |cls|
                     if cls.canal == client.canal
@@ -89,7 +95,9 @@ def parser(msg,client,clientes,canais)
         flag= true
     when "USUARIO"
         if aux.tr("\n","")== "" || aux.tr("\n","")== nil
+            client.client.puts 
             client.client.puts "É preciso passar um parametro para USUARIO. Exemplo: USUARIO breno"
+            client.client.puts 
         else
             client.usuario = aux.tr("\n","")
             client.client.puts
@@ -135,7 +143,10 @@ def parser(msg,client,clientes,canais)
     when "ENTRAR"
         if aux.to_i > 0 && aux.to_i <= 5 
             if aux.to_i == client.canal
+
+                client.client.puts 
                 client.client.puts "Você já está no canal selecionado"
+                client.client.puts 
             else
                 client.canal=aux.to_i
                 clientes.each do |cls|
@@ -149,7 +160,9 @@ def parser(msg,client,clientes,canais)
                 end 
             end
         else
+            client.client.puts 
             client.client.puts "O canal que foi digitado não existe"
+            client.client.puts 
         end
         flag=true
     when "COMANDOS"
@@ -168,12 +181,17 @@ def parser(msg,client,clientes,canais)
         client.client.puts
         flag=true
     when "ERROR"
+
+        client.client.puts 
         client.client.puts "Para vc começar a conversar com outras pessoas utilize o comando USUARIO"
+        client.client.puts 
         flag=true
     when "ERROR2"
+        client.client.puts         
         client.client.puts "Você não está conectado"
         client.client.puts "utilize o comando LISTAR para ver os canais disponiveis"
         client.client.puts "E utilize o comando ENTRAR para entrar no canal desejado"
+        client.client.puts 
         flag=true 
     else
              
@@ -187,10 +205,10 @@ loop {
         client = Client.new(server.accept_nonblock)
         unless clientes.include?(client)
             clientes << client
-            client.client.puts "####################################"
-            client.client.puts "#        Bem vindo ao chat         #"
-            client.client.puts "#    Segue abaixo as instruções    #"
-            client.client.puts "####################################"
+            client.client.puts "                    ####################################"
+            client.client.puts "                    #        Bem vindo ao chat         #"
+            client.client.puts "                    #    Segue abaixo as instruções    #"
+            client.client.puts "                    ####################################"
             client.client.puts
             client.client.puts "Comandos aceitos pelo chat: NICK, USUARIO, LISTAR, SAIR, SAIRC, ENTRAR, COMANDOS"
             client.client.puts
