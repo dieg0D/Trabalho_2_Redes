@@ -61,34 +61,44 @@ def parser(msg,client,clientes,canais)
     case comando
     when "NICK"
         igual = false
-        clientes.each do |cls|
-            if aux.tr("\n","") == cls.nick && cls != client
-                igual = true
-            end
-        end
-
-        if igual == true
-            client.client.puts "Esse nick já está em uso por favor selecione outro!!!"
+        if aux.tr("\n", "") == ""
+                client.client.puts "É preciso passar um parametro para NICK. Exemplo: NICK diego"            
         else
             clientes.each do |cls|
-                if cls.canal == client.canal
-                    if cls != client
-                        cls.client.puts "#{Time.now.strftime("%H:%M")} #{client.nick} teve seu nick alterado para #{aux.tr("\n","")}"
-                    else
-                        client.client.puts "#{Time.now.strftime("%H:%M")} Seu nick foi alterado de #{client.nick} para #{aux.tr("\n","")}"
-                    end
+                if aux.tr("\n","") == cls.nick && cls != client       
+                    igual = true
                 end
             end
-             client.nick= aux.tr("\n","")
 
+            if igual == true
+                client.client.puts "Esse nick já está em uso por favor selecione outro!!!"
+            else
+                clientes.each do |cls|
+                    if cls.canal == client.canal
+                        if cls != client
+                            cls.client.puts "#{Time.now.strftime("%H:%M")} #{client.nick} teve seu nick alterado para #{aux.tr("\n","")}"
+                        else
+                            client.client.puts "#{Time.now.strftime("%H:%M")} Seu nick foi alterado de #{client.nick} para #{aux.tr("\n","")}"
+                        end
+                    end
+                end
+                 client.nick= aux.tr("\n","")
+
+            end
         end
         flag= true
     when "USUARIO"
-        client.usuario = aux.tr("\n","")
-        client.client.puts "Muito bem vc se cadastrou!"
-        client.client.puts "utilize o comando LISTAR para ver os canais disponiveis"
-        client.client.puts "E utilize o comando ENTRAR para entrar no canal desejado"
-        flag=true
+        if aux.tr("\n","")== "" || aux.tr("\n","")== nil
+            client.client.puts "É preciso passar um parametro para USUARIO. Exemplo: USUARIO breno"
+        else
+            client.usuario = aux.tr("\n","")
+            client.client.puts
+            client.client.puts "Muito bem vc se cadastrou!"
+            client.client.puts "utilize o comando LISTAR para ver os canais disponiveis"
+            client.client.puts "E utilize o comando ENTRAR para entrar no canal desejado"
+            client.client.puts 
+        end
+            flag=true
     when "LISTAR"
         client.listar(clientes,canais)
 
