@@ -21,6 +21,7 @@ class Client
     end
 
     def listar(clientes, canais)
+        
         @client.puts 
         @canais.each_with_index do |cn, index|
             @client.puts "Canal {#{index+1}} - #{cn} #{contar(clientes, index+1)} pessoas conectadas "
@@ -55,7 +56,9 @@ def parser(msg,client,clientes,canais)
         client.usuario = aux.tr("\n","")
         flag=true
     when "LISTAR"
+
         client.listar(clientes,canais)
+
         flag=true 
     when "SAIR"
         clientes.each do |cls|
@@ -89,6 +92,7 @@ def parser(msg,client,clientes,canais)
         end
         flag=true
     when"COMANDOS"
+        client.client.puts
         client.client.puts "Comandos aceitos pelo chat: NICK, USUARIO, LISTAR, SAIR, SAIRC, ENTRAR"
         client.client.puts "NICK altere seu apelido" 
         client.client.puts "USUARIO altere seu nome"
