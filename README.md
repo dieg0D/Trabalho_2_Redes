@@ -13,4 +13,3 @@ execute primeiro o servidor : ruby server.rb
 
 Depois os clients: ruby client.rb
 
-Lembrando que cada cliente é uma janela do terminal 
