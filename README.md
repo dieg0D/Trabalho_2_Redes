@@ -2,9 +2,9 @@
 
 
 Membros do grupo :
--Breno Felipe Nunes Gomes
--Diego Antônio Barbosa Cardoso
--Diego Vaz Fernandes
+Breno Felipe Nunes Gomes
+Diego Antônio Barbosa Cardoso
+Diego Vaz Fernandes
 
 
 Para  executar vc precisa ter o ruby instalado em sua maquina : https://www.ruby-lang.org/pt/
