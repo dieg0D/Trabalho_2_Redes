@@ -2,8 +2,8 @@
 
 
 Membros do grupo :
-Breno Felipe Nunes Gomes
-Diego Antônio Barbosa Cardoso
+Breno Felipe Nunes Gomes,
+Diego Antônio Barbosa Cardoso,
 Diego Vaz Fernandes
 
 
